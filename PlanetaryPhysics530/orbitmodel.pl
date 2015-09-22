@@ -100,6 +100,7 @@ sub compute_vr_product {
 # 22 time increments.  This subroutine utilizes the above general routines
 # in a very specific way.
 sub mercury_22 {
+	my $commaSeperated=1; # true
 	### Specific to Mercury and how model is computed.
 	my $theta_start = 180; #degrees
 	my $theta_n = $theta_start;
@@ -115,7 +116,12 @@ sub mercury_22 {
 	my $wn;
 	my $elapsedTime_n = 0.0;
 	my $timeIncrement = compute_timeincrement($orbitalPeriod, $numberTimeIncrements);
-	print "Step", "\t", "ElapTime", "\t\t", "Theta", "\t\t", "r", "\t\t", "w", "\t\t", "v", "\n";
+	if (!$commaSeperated) {
+		print "Step", "\t", "ElapTime", "\t\t", "Theta", "\t\t", "Theta(mod360)", "\t\t", "r", "\t\t", "w", "\t\t", "v", "\n";
+	}
+	if ($commaSeperated) {
+		print "Step,ElapTime(days),Theta(deg),Theta(mod360)(deg),r(AU),w(deg/day),v(m/s),vr", "\n";
+	}
 	for (my $n=0; $n<($numberTimeIncrements+1); $n++) {
 		$rn = get_r($a, $e, $theta_n); # rn is in AU.
 		$vn = get_v($a, $rn); # vn is in m/s.
@@ -125,8 +131,13 @@ sub mercury_22 {
 
 		#print $n , "\t", $elapsedTime_n, "\t\t", $theta_n, "\t\t", $rn, "\t\t", $wn, "\t\t", $vn, "\n";
 
-		print $n , "\n", "ET=", $elapsedTime_n, "\n", "THETA=",$theta_n, "\n", "THETA(mod360)=", $theta_n%360, "\n", "R=", $rn, "\n", "W=",$wn, "\n", "V=", $vn, "\n", "VR=", $vr, "\n";
+		if (!$commaSeperated) {
+			print $n , "\n", "ET=", $elapsedTime_n, "\n", "THETA=",$theta_n, "\n", "THETA(mod360)=", $theta_n%360, "\n", "R=", $rn, "\n", "W=",$wn, "\n", "V=", $vn, "\n", "VR=", $vr, "\n";
+		}
 
+		if ($commaSeperated) {
+			print $n, ",",$elapsedTime_n, ",",$theta_n,",",$theta_n%360,",",$rn,",",$wn,",",$vn,",",$vr,"\n";
+		}
 		$theta_n = $theta_n + $wn*$timeIncrement;
 		$elapsedTime_n = $elapsedTime_n + $timeIncrement;
 	}
